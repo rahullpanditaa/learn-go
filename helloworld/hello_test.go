@@ -11,4 +11,12 @@ func TestHello(t *testing.T) {
 			t.Errorf("got %q want %q", got, want)
 		}
 	})
+	t.Run("say Hello, [name] given a name argument", func(t *testing.T) {
+		got := Hello("Rahul")
+		want := "Hello, Rahul"
+
+		if got != want {
+			t.Errorf("got %q, want %q", got, want)
+		}
+	})
 }
