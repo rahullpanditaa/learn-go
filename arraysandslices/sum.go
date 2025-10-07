@@ -9,10 +9,14 @@ func Sum(numbers []int) int {
 }
 
 // numbersToSum will be a slice of type [][]int
-func SumAll(numbersToSum ...[]int) []int {
+func SumAllTails(numbersToSum ...[]int) []int {
 	var sums []int
 	for _, numbers := range numbersToSum {
-		sums = append(sums, Sum(numbers))
+		if len(numbers) <= 1 {
+			sums = append(sums, 0)
+		} else {
+			sums = append(sums, Sum(numbers[1:]))
+		}
 	}
 
 	return sums
