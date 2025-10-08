@@ -6,9 +6,6 @@ type Dictionary map[string]string
 
 var ErrNotFound = errors.New("word not found")
 
-// the internal reference to the map is copied to method
-// technically, a copy, but point to the same location in memory
-// changes here will change state
 func (d Dictionary) Search(word string) (string, error) {
 	definition, ok := d[word]
 
@@ -16,4 +13,8 @@ func (d Dictionary) Search(word string) (string, error) {
 		return "", ErrNotFound
 	}
 	return definition, nil
+}
+
+func (d Dictionary) Add(word, definition string) {
+	d[word] = definition
 }
