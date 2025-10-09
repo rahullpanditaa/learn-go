@@ -1,46 +1,33 @@
 package main
 
-import "fmt"
-
-func generator(limit int, ch chan<- int) {
-	for i := 2; i < limit; i++ {
-		ch <- i
-	}
-	close(ch)
-}
-
-func filter(src <-chan int, dst chan<- int, prime int) {
-	for i := range src {
-		if i%prime != 0 {
-			dst <- i
-		}
-	}
-
-	close(dst)
-}
-
-func sieve(limit int) {
-	ch := make(chan int)
-
-	go generator(limit, ch)
-
-	for {
-		prime, ok := <-ch
-
-		if !ok {
-			break
-		}
-
-		ch1 := make(chan int)
-		go filter(ch, ch1, prime)
-
-		ch = ch1
-
-		fmt.Print(prime, " ")
-	}
-}
+import (
+	"fmt"
+	"time"
+)
 
 func main() {
-	sieve(100) // 2 3 5 7 11 13 17 19
+	chans := []chan int{
+		make(chan int),
+		make(chan int),
+	}
 
+	for i := range chans {
+		go func(i int, ch chan<- int) {
+			for {
+				time.Sleep(time.Duration(i) * time.Second)
+				ch <- i
+			}
+		}(i+1, chans[i])
+	}
+
+	for range 12 {
+		// i1 := <-chans[0]
+		// i2 := <-chans[1]
+		select {
+		case m0 := <-chans[0]:
+			fmt.Println("received", m0)
+		case m1 := <-chans[1]:
+			fmt.Println("received", m1)
+		}
+	}
 }
