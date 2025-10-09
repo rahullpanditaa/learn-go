@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"time"
 )
@@ -20,5 +21,29 @@ func get(url string, ch chan<- result) {
 		t := time.Since(start).Round(time.Millisecond)
 		ch <- result{url, nil, t}
 		resp.Body.Close()
+	}
+}
+
+func main() {
+	results := make(chan result)
+
+	urls := []string{
+		"https://google.com",
+		"https://boot.dev",
+		"https://amazon.com",
+	}
+
+	for _, url := range urls {
+		go get(url, results)
+	}
+
+	for range urls {
+		r := <-results
+
+		if r.err != nil {
+			log.Printf("%-20s %s\n", r.url, r.err)
+		} else {
+			log.Printf("%-20s %s\n", r.url, r.latency)
+		}
 	}
 }
