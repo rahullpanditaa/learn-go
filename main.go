@@ -7,15 +7,21 @@ import (
 	"net/http"
 )
 
-var nextId int
+var nextID = make(chan int)
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "<h1>You got %d<h1>", nextId)
+	fmt.Fprintf(w, "<h1>You got %d<h1>", <-nextID)
 
-	nextId++ // UNSAFE
+}
+
+func counter() {
+	for i := 0; ; i++ {
+		nextID <- i
+	}
 }
 
 func main() {
+	go counter()
 	http.HandleFunc("/", handler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
