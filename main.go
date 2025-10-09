@@ -1,27 +1,46 @@
 package main
 
-// solving data race using channels
-import (
-	"fmt"
-	"log"
-	"net/http"
-)
+import "fmt"
 
-var nextID = make(chan int)
-
-func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "<h1>You got %d<h1>", <-nextID)
-
+func generator(limit int, ch chan<- int) {
+	for i := 2; i < limit; i++ {
+		ch <- i
+	}
+	close(ch)
 }
 
-func counter() {
-	for i := 0; ; i++ {
-		nextID <- i
+func filter(src <-chan int, dst chan<- int, prime int) {
+	for i := range src {
+		if i%prime != 0 {
+			dst <- i
+		}
+	}
+
+	close(dst)
+}
+
+func sieve(limit int) {
+	ch := make(chan int)
+
+	go generator(limit, ch)
+
+	for {
+		prime, ok := <-ch
+
+		if !ok {
+			break
+		}
+
+		ch1 := make(chan int)
+		go filter(ch, ch1, prime)
+
+		ch = ch1
+
+		fmt.Print(prime, " ")
 	}
 }
 
 func main() {
-	go counter()
-	http.HandleFunc("/", handler)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	sieve(100) // 2 3 5 7 11 13 17 19
+
 }
