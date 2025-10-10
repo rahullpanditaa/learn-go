@@ -17,4 +17,11 @@ func main() {
 	j, _ := json.Marshal(r)
 	fmt.Println(string(j))
 	fmt.Printf("%#v\n", r)
+
+	var r2 Response
+
+	// unmarshal takes a json encoded byte slice, pointer where to put it
+	// decodes the json
+	_ = json.Unmarshal(j, &r2)
+	fmt.Printf("%#v\n", r2)
 }
