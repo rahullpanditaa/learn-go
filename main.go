@@ -1,27 +1,20 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
+	"log"
+	"net/http"
 )
 
-type Response struct {
-	Page  int      `json:"page"`
-	Words []string `json:"words,omitempty"`
+func handler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Hello, world from %s\n", r.URL.Path[1:])
 }
 
 func main() {
-	r := &Response{Page: 1, Words: []string{"up", "in", "out"}}
+	// bind the handler against a route
+	http.HandleFunc("/", handler)
 
-	// Marshal returns a byte slice and an error
-	j, _ := json.Marshal(r)
-	fmt.Println(string(j))
-	fmt.Printf("%#v\n", r)
-
-	var r2 Response
-
-	// unmarshal takes a json encoded byte slice, pointer where to put it
-	// decodes the json
-	_ = json.Unmarshal(j, &r2)
-	fmt.Printf("%#v\n", r2)
+	// start a server -> open a TCP socket that can accept
+	// HTTP requests
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
