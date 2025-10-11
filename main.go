@@ -7,8 +7,10 @@ import (
 	"os"
 )
 
+const url = "https://jsonplaceholder.typicode.com"
+
 func main() {
-	resp, err := http.Get("http://localhost:8080/" + os.Args[1])
+	resp, err := http.Get(url + "/todos/1")
 
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -26,5 +28,4 @@ func main() {
 
 		fmt.Println(string(body))
 	}
-
 }
