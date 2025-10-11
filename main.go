@@ -2,19 +2,29 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"io"
 	"net/http"
+	"os"
 )
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello, world from %s\n", r.URL.Path[1:])
-}
-
 func main() {
-	// bind the handler against a route
-	http.HandleFunc("/", handler)
+	resp, err := http.Get("http://localhost:8080/" + os.Args[1])
 
-	// start a server -> open a TCP socket that can accept
-	// HTTP requests
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(-1)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusOK {
+		body, err := io.ReadAll(resp.Body)
+
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(-1)
+		}
+
+		fmt.Println(string(body))
+	}
+
 }
