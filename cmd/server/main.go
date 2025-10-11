@@ -3,7 +3,6 @@ package server
 import (
 	"encoding/json"
 	"html/template"
-	"io"
 	"net/http"
 	"os"
 )
@@ -31,14 +30,20 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	// body, err := io.ReadAll(resp.Body)
+	// if err != nil {
+	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
+	// 	return
+	// }
 
 	var item todo
-	err = json.Unmarshal(body, &item)
+
+	// instead of doing a io.ReadAll, getting a slice of bytes
+	// then taking that byte slice and passing it to
+	// json.Unmarshal, can simply pass the response Body
+	// to New Decoder and then Decode into the designated place all in one line
+	err = json.NewDecoder(resp.Body).Decode(&item)
+
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
